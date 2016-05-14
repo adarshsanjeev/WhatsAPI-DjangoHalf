@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.forms.widgets import HiddenInput
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -8,7 +8,7 @@ from .models import UserForm
 
 # import webwhatsapp
 
-@login_required(login_url="/WhatsAPI/login/")
+@login_required(login_url="/WhatsAPI/login")
 def index(request):
     return render(request, "index.html", {})
 
@@ -18,8 +18,8 @@ def user_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
-        if user is not None:
-            login(username, password)
+        if user:
+            login(request, user)
             return HttpResponseRedirect('/WhatsAPI')
         else:
             form_errors = "Username or password is incorrect"
@@ -32,8 +32,13 @@ def user_register(request):
         if user_form.is_valid():
             user = user_form.save()
             user.set_password(user.password)
-            return HttpResponseRedirect('/WhatsAPI')
+            return HttpResponseRedirect('/WhatsAPI/login')
     else:
         user_form = UserForm()
     return render(request, 'register.html', {'user_form':user_form})
 
+@login_required(login_url="/WhatsAPI/login")
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect("/WhatsAPI")
+    
