@@ -1,0 +1,14 @@
+<title>Login Page</title>
+<h3>Login in to your account!</h3>
+{% if form_errors %}
+<div style="color:red">
+{{form_errors}}
+</div>
+{% endif %}
+<form action="." method="POST" style="width:35%;">
+  {% csrf_token %}
+  Username: <input type="text" name="username"><p>
+  Password: <input type="password" name="password"><p>
+  <input type="submit" value="Login">
+</form>
+<a href={% url "API:register" %}>Create a new user</a>
