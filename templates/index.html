@@ -1,4 +1,15 @@
 <title>WhatsAPI</title>
 <body>
+  {% if filename %}
   <img src=/media/{{filename}} />
+  {% else %}
+  {% if message %}
+  {{message}}
+  {% endif %}
+  <form action="." method="POST">
+	{% csrf_token %}
+	{{ form.as_p }}
+	<input type="submit" value="Send Message">
+  </form>
+  {% endif %}
 </body>

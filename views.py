@@ -1,19 +1,26 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.forms.widgets import HiddenInput
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import UserForm
 from django.conf import settings
+from django import forms
 
 from WhatsAPI.webwhatsapp import WhatsAPIDriver
 from time import sleep
 
 Driver_Dict = {}
+# '.spinner-container'
+class MessageForm(forms.Form):
+    contact_name = forms.CharField(max_length=100)
+    message = forms.CharField(max_length=500)
 
 @login_required(login_url="/WhatsAPI/login/")
 def index(request):
+    message = None
+
     user_driver = Driver_Dict.get(request.user)
     if user_driver is None:
         try:
@@ -21,16 +28,33 @@ def index(request):
             user_driver = Driver_Dict[request.user]
             user_driver.username = request.user.username
             sleep(1)
+        except:
+            Driver_Dict[request.user] = None
+            return HttpResponseServerError("Server Error: Could not create a new driver")
+    if "Use WhatsApp on your phone to scan the code" in user_driver.driver.page_source:
+        try:
             user_driver.firstrun()
             filename = request.user.username+".png"
             return render(request, 'index.html', {'filename':filename})
         except:
-            Driver_Dict[request.user] = None
-            return HttpResponse("Server Error, try again later")
+            return HttpResponseServerError("Server Error, try again later")
     else:
-        user_driver.send_message("Mukul", "Test Message from django, sup")
-    return HttpResponse("SUCCESS")
-    # return render(request, "index.html", {})
+        if request.POST:
+            form = MessageForm(request.POST)
+            if form.is_valid():
+                contact = form.cleaned_data['contact_name']
+                message = form.cleaned_data['message']
+                val = user_driver.send_message(contact, message)
+                if val is True:
+                    message = "Message sent"
+                    form = MessageForm()
+                elif val is False:
+                    message = "Contact not found"
+                else:
+                    message = str(val)
+        else:
+            form = MessageForm()
+        return render(request, "index.html", {'form':form, 'message':message})
 
 def user_login(request):
     form_errors = None
@@ -60,5 +84,5 @@ def user_register(request):
 @login_required(login_url="/WhatsAPI/login")
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect("/WhatsAPI")
+    return HttpResponseRedirect("/WhatsAPI/login")
     
