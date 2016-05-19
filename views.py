@@ -5,12 +5,32 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import UserForm
+from django.conf import settings
 
-# import webwhatsapp
+from WhatsAPI.webwhatsapp import WhatsAPIDriver
+from time import sleep
 
-@login_required(login_url="/WhatsAPI/login")
+Driver_Dict = {}
+
+@login_required(login_url="/WhatsAPI/login/")
 def index(request):
-    return render(request, "index.html", {})
+    user_driver = Driver_Dict.get(request.user)
+    if user_driver is None:
+        try:
+            Driver_Dict[request.user] = WhatsAPIDriver()
+            user_driver = Driver_Dict[request.user]
+            user_driver.username = request.user.username
+            sleep(1)
+            user_driver.firstrun()
+            filename = request.user.username+".png"
+            return render(request, 'index.html', {'filename':filename})
+        except:
+            Driver_Dict[request.user] = None
+            return HttpResponse("Server Error, try again later")
+    else:
+        user_driver.send_message("Mukul", "Test Message from django, sup")
+    return HttpResponse("SUCCESS")
+    # return render(request, "index.html", {})
 
 def user_login(request):
     form_errors = None
