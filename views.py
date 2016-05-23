@@ -24,9 +24,8 @@ def index(request):
     user_driver = Driver_Dict.get(request.user)
     if user_driver is None:
         try:
-            Driver_Dict[request.user] = WhatsAPIDriver()
+            Driver_Dict[request.user] = WhatsAPIDriver(request.user.username)
             user_driver = Driver_Dict[request.user]
-            user_driver.username = request.user.username
             sleep(1)
         except:
             Driver_Dict[request.user] = None
@@ -36,8 +35,8 @@ def index(request):
             user_driver.firstrun()
             filename = request.user.username+".png"
             return render(request, 'index.html', {'filename':filename})
-        except:
-            return HttpResponseServerError("Server Error, try again later")
+        except Exception as e:
+            return HttpResponseServerError("Server Error, try again later %s" %(str(e)))
     else:
         if request.POST:
             form = MessageForm(request.POST)
@@ -55,6 +54,17 @@ def index(request):
         else:
             form = MessageForm()
         return render(request, "index.html", {'form':form, 'message':message})
+
+@login_required(login_url="/WhatsAPI/login/")
+def get_unread(request):
+    user_driver = Driver_Dict.get(request.user)
+    if user_driver is None:
+        return Http404("You are not logged in to get messages")
+    else:
+        messages = user_driver.update_unread()
+        if messages == []:
+            return HttpResponse("No new messages")
+        return HttpResponse(str(messages))
 
 def user_login(request):
     form_errors = None
