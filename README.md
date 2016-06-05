@@ -1,7 +1,7 @@
 ## Installation
 Clone the repo 
 
-    git clone git@github.com:adarshsanjeev/WhatsAPI-DjangoHalf.git
+    git clone --recursive git@github.com:adarshsanjeev/WhatsAPI-DjangoHalf.git
 
 Cd into it
 	
