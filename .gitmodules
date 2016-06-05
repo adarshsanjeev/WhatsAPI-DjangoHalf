@@ -1,0 +1,3 @@
+[submodule "WhatsAPI-Django/WhatsAPI"]
+	path = WhatsAPI-Django/WhatsAPI
+	url = git@github.com:mukulhase/WhatsAPI.git
