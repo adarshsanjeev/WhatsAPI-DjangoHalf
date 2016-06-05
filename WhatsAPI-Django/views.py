@@ -50,9 +50,9 @@ def index(request):
                     message = "Contact not found"
                 else:
                     message = str(val)
-        unread = user_driver.view_unread()
         else:
             form = MessageForm()
+        unread = user_driver.view_unread()
 
         return render(request, "index.html", {'form':form, 'message':message, 'unread':unread})
 
