@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.forms.widgets import HiddenInput
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,12 +11,12 @@ from WhatsAPI.webwhatsapp import WhatsAPIDriver
 from time import sleep
 
 Driver_Dict = {}
-# '.spinner-container'
+
 class MessageForm(forms.Form):
     contact_name = forms.CharField(max_length=100)
     message = forms.CharField(max_length=500)
 
-@login_required(login_url="/WhatsAPI/login/")
+@login_required
 def index(request):
     message = None
 
@@ -55,7 +54,7 @@ def index(request):
             form = MessageForm()
         return render(request, "index.html", {'form':form, 'message':message})
 
-@login_required(login_url="/WhatsAPI/login/")
+@login_required
 def get_unread(request):
     user_driver = Driver_Dict.get(request.user)
     if user_driver is None:
@@ -65,19 +64,6 @@ def get_unread(request):
         if messages == []:
             return HttpResponse("No new messages")
         return HttpResponse(str(messages))
-
-def user_login(request):
-    form_errors = None
-    if request.POST:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            login(request, user)
-            return HttpResponseRedirect('/WhatsAPI')
-        else:
-            form_errors = "Username or password is incorrect"
-    return render(request, 'login.html', {'form_errors':form_errors}) 
    
 def user_register(request):
     if request.POST:
@@ -86,13 +72,10 @@ def user_register(request):
         if user_form.is_valid():
             user = user_form.save()
             user.set_password(user.password)
-            return HttpResponseRedirect('/WhatsAPI/login')
+            return HttpResponseRedirect('/')
     else:
         user_form = UserForm()
     return render(request, 'register.html', {'user_form':user_form})
-
-@login_required(login_url="/WhatsAPI/login")
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect("/WhatsAPI/login")
     
+def redirect(request):
+    return HttpResponseRedirect('/')
