@@ -7,7 +7,7 @@ from .models import UserForm
 from django.conf import settings
 from django import forms
 
-from WhatsAPI.webwhatsapp import WhatsAPIDriver
+from WhatsAPIDjango.WhatsAPI.webwhatsapp import WhatsAPIDriver
 from time import sleep
 
 Driver_Dict = {}

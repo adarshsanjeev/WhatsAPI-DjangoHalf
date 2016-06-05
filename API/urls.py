@@ -20,5 +20,5 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('WhatsAPI-Django.urls', namespace = "API")),
+    url(r'', include('WhatsAPIDjango.urls', namespace = "API")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
