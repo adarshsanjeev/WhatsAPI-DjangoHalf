@@ -19,7 +19,7 @@ class MessageForm(forms.Form):
 @login_required
 def index(request):
     message = None
-
+    unread = None
     user_driver = Driver_Dict.get(request.user)
     if user_driver is None:
         try:
@@ -50,9 +50,11 @@ def index(request):
                     message = "Contact not found"
                 else:
                     message = str(val)
+        unread = user_driver.view_unread()
         else:
             form = MessageForm()
-        return render(request, "index.html", {'form':form, 'message':message})
+
+        return render(request, "index.html", {'form':form, 'message':message, 'unread':unread})
 
 @login_required
 def get_unread(request):
