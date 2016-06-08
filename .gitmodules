@@ -1,3 +1,4 @@
 [submodule "WhatsAPIDjango/WhatsAPI"]
 	path = WhatsAPIDjango/WhatsAPI
-	url = git@github.com:mukulhase/WhatsAPI.git
+	url = https://github.com/mukulhase/WhatsAPI.git
+
