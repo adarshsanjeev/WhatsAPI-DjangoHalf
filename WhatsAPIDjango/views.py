@@ -77,7 +77,7 @@ def user_register(request):
             return HttpResponseRedirect('/')
     else:
         user_form = UserForm()
-    return render(request, 'register.html', {'user_form':user_form})
+    return render(request, 'registration/register.html', {'user_form':user_form})
     
 def redirect(request):
     return HttpResponseRedirect('/')
