@@ -34,8 +34,8 @@ def index(request):
             user_driver.firstrun()
             filename = request.user.username+".png"
             return render(request, 'index.html', {'filename':filename})
-        except Exception as e:
-            return HttpResponseServerError("Server Error, try again later %s" %(str(e)))
+        except Exception:
+            return HttpResponseServerError("Server Error, try again later or contact admin")
     else:
         if request.POST:
             form = MessageForm(request.POST)
@@ -74,6 +74,7 @@ def user_register(request):
         if user_form.is_valid():
             user = user_form.save()
             user.set_password(user.password)
+            user.save()
             return HttpResponseRedirect('/')
     else:
         user_form = UserForm()
